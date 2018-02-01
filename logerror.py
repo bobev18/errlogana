@@ -54,15 +54,8 @@ class TestError():
                 self.setcause('logged off', '')
                 return 'logged off'
 
-
-            kickoff1 = html.count('<redirect><![CDATA[http://cobmaximo/maximotrain/webclient/login/logout.jsp?timeout=true]]></redirect>') > 0
-            kickoff2 = html.count("<![CDATA[warnExit=false; document.location='http://cobmaximo/maximotrain/webclient/login/exit.jsp?sharedSession=1';]]>") > 0
-            kickoff3 = html.count("<![CDATA[warnExit=false; document.location='http://cobmaximo/maximosand/webclient/login/exit.jsp?sharedSession=1';]]>") > 0
-            kickoff4 = html.count('<redirect><![CDATA[http://cobmaximo/maximosand/webclient/login/logout.jsp]]></redirect>') > 0
-            kickoff5 = html.count("<redirect><![CDATA[http://vcobappspr43/maximo/webclient/login/logout.jsp?timeout=true]]></redirect>") > 0
-            kickoff6 = html.count("<![CDATA[warnExit=false; document.location='http://vcobappspr43/maximo/webclient/login/exit.jsp?sharedSession=1';]]>") > 0
-            if any([kickoff1,kickoff2,kickoff3,kickoff4,kickoff5,kickoff6]):
-            # html.count(kickoff1)>0 or html.count(kickoff2)>0 or html.count(kickoff3)>0 or html.count(kickoff4)>0 or html.count(kickoff5)>0 or html.count(kickoff6)>0:
+            kick_match = re.search(r'redirect><\!\[CDATA\[https*://.+?/maximo/webclient/login/logout.jsp.*?\]\]></redirect>', html)
+            if kick_match is not None:
                 self.setcause('kicked out', '')
                 return 'kicked out'
 
@@ -94,7 +87,7 @@ class TestError():
                 self.setcause('Critical Message', msg)
                 return 'Critical Message: ' + msg
 
-            if html.count('title="0 - 0 of 0">0 - 0 of 0')>0:
+            if html.count('>0 - 0 of 0')>0:
                 self.setcause('filter zero match', 'searchterm: ' + self.validation)
                 return 'filter zero match'
 
