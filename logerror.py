@@ -56,10 +56,14 @@ class TestError():
 
             kick_match = re.search(r'redirect><\!\[CDATA\[https*://.+?/maximo/webclient/login/logout.jsp.*?\]\]></redirect>', html)
             if kick_match is not None:
-                self.setcause('kicked out', '')
-                return 'kicked out'
+                self.setcause('Maximo forcefully signed out the user', '')
+                return 'signed out'
 
             if html.count('title="Please wait...">Please wait...</label>')>0:
+                self.setcause('Long Op', '')
+                return 'Long Op'
+            
+            if html.count("addLongOpTimeout('dolongopquerycheck()',")>0:
                 self.setcause('Long Op', '')
                 return 'Long Op'
 
@@ -82,14 +86,15 @@ class TestError():
             if html.count('st_MessageCritical.png')>0:
                 msg = html[html.find('st_MessageCritical.png'):]
                 msg = '<' + msg[:msg.find('</table>')]
+                msg = msg[:msg.find('</component>')]                
                 msg = re.sub(r'<[^>]*?>', '', msg)
                 msg = msg.replace('\n','').strip()
                 self.setcause('Critical Message', msg)
                 return 'Critical Message: ' + msg
 
             if html.count('>0 - 0 of 0')>0:
-                self.setcause('filter zero match', 'searchterm: ' + self.validation)
-                return 'filter zero match'
+                self.setcause('operation resulted in a table with zero rows', 'searchterm: ' + self.validation)
+                return 'table with zero rows'
 
             break_index = html.find('---------------Response-----------------')
             html_request_only = html[:break_index]
